@@ -12,6 +12,8 @@ import com.schoudhary.DriverAllocation.providers.QueueBasedDriverProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -24,20 +26,24 @@ public class DriverAllocationApplication {
 		DriverManager driverManager = new DefaultDriverManager(driverProvider);
 		BookingManager bookingManager = new DefaultBookingManager(driverProvider,driverManager);
 
+		Map<Integer, String> commands = new HashMap<>();
+		commands.put(1,"register_driver");
+		commands.put(2,"dispatch_driver_for_a_booking");
+		commands.put(3,"complete_booking");
 
 		Scanner sc = new Scanner(System.in);
-		System.out.println("Usage:\n register_driver <driverID> \n dispatch_driver_for_a_booking <booking distance> " +
-				"\n complete_booking <booking_id> ");
+		System.out.println("Usage:\n 1. register_driver <driverID> \n 2. dispatch_driver_for_a_booking <booking distance> " +
+				"\n 3. complete_booking <booking_id> ");
 		while(true){
 			try {
 				String[] command = sc.nextLine().split(" ");
-				switch (command[0]){
-					case "register_driver": {
+				switch (Integer.parseInt(command[0])){
+					case 1: {
 						driverManager.signUp(new SignupRequest(command[1]));
 						System.out.println(driverManager.getDriverById(command[1]));
 						break;
 					}
-					case "dispatch_driver_for_a_booking": {
+					case 2: {
 						try{
 							Long bookingId = bookingManager.bookRide(new BookingRequest(Double.parseDouble(command[1])));
 							System.out.println("Ride booked with booking id:"+bookingId);
@@ -46,7 +52,7 @@ public class DriverAllocationApplication {
 						}
 						break;
 					}
-					case "complete_booking": {
+					case 3: {
 						String driverId = bookingManager.completeRide(Long.parseLong(command[1]));
 						System.out.println("Driver Released: "+driverId);
 						break;
